@@ -1,0 +1,46 @@
+{
+  "name": "WA Attribution Toolkit - Event Receiver",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "wa-attribution",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.event}}",
+              "operation": "equals",
+              "value2": "lead_created"
+            }
+          ]
+        }
+      },
+      "name": "Is Lead Created",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [520, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is Lead Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
