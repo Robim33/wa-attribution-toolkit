@@ -14,6 +14,18 @@ Core idea:
 Ad click -> tracked URL -> click_id -> WhatsApp/landing page -> lead event -> n8n/CRM/dashboard
 ```
 
+## Flow
+
+```text
+Ads / social / QR code
+  -> Shlink short URL or direct tracked URL
+  -> Cloudflare Worker /track
+  -> D1 click record
+  -> WhatsApp or landing page
+  -> /leads
+  -> n8n / CRM / dashboard
+```
+
 ## Features
 
 - Capture `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`
