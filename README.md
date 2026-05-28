@@ -157,6 +157,7 @@ npm run deploy
 
 - [Architecture](docs/architecture.md)
 - [Deployment](docs/deployment.md)
+- [Local testing](docs/local-testing.md)
 - [Shlink integration](docs/shlink.md)
 - [n8n integration](docs/n8n.md)
 - [Anthropic application draft](docs/anthropic-application.md)
