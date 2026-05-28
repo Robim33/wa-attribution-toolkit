@@ -5,6 +5,7 @@ type Env = {
 	SHLINK_API_KEY?: string;
 	DEFAULT_WHATSAPP_PHONE?: string;
 	DEFAULT_REDIRECT_URL?: string;
+	ADMIN_TOKEN?: string;
 };
 
 type LeadPayload = {
@@ -53,6 +54,11 @@ function createClickId() {
 
 function nowIso() {
 	return new Date().toISOString();
+}
+
+function isAdminRequest(request: Request, env: Env) {
+	if (!env.ADMIN_TOKEN) return true;
+	return request.headers.get("authorization") === `Bearer ${env.ADMIN_TOKEN}`;
 }
 
 function normalizeTarget(url: URL, env: Env) {
@@ -230,7 +236,11 @@ async function handleCreateLink(request: Request, env: Env) {
 	return json({ tracked_url: trackedUrl.toString(), shlink });
 }
 
-async function handleStats(env: Env) {
+async function handleStats(request: Request, env: Env) {
+	if (!isAdminRequest(request, env)) {
+		return json({ error: "unauthorized" }, { status: 401 });
+	}
+
 	const clicks = await env.DB.prepare("SELECT COUNT(*) as total FROM clicks").first<{ total: number }>();
 	const leads = await env.DB.prepare("SELECT COUNT(*) as total FROM leads").first<{ total: number }>();
 	const recentClicks = await env.DB.prepare(
@@ -255,7 +265,7 @@ export default {
 			if (url.pathname === "/track" && request.method === "GET") return handleTrack(request, env);
 			if (url.pathname === "/leads" && request.method === "POST") return handleLead(request, env);
 			if (url.pathname === "/links" && request.method === "POST") return handleCreateLink(request, env);
-			if (url.pathname === "/stats" && request.method === "GET") return handleStats(env);
+			if (url.pathname === "/stats" && request.method === "GET") return handleStats(request, env);
 
 			return json({ error: "not_found" }, { status: 404 });
 		} catch (error) {
