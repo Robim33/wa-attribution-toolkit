@@ -48,6 +48,16 @@ function json(data: unknown, init: ResponseInit = {}) {
 	});
 }
 
+function html(body: string, init: ResponseInit = {}) {
+	return new Response(body, {
+		...init,
+		headers: {
+			"content-type": "text/html; charset=utf-8",
+			...init.headers,
+		},
+	});
+}
+
 function createClickId() {
 	return crypto.randomUUID();
 }
@@ -90,6 +100,49 @@ function appendClickId(target: string, clickId: string) {
 
 	targetUrl.searchParams.set("click_id", clickId);
 	return targetUrl.toString();
+}
+
+function handleHome(request: Request) {
+	const baseUrl = new URL(request.url).origin;
+
+	return html(`<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>WA Attribution Toolkit</title>
+	<style>
+		body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; background: #0f172a; color: #e5e7eb; }
+		main { max-width: 920px; margin: 0 auto; padding: 56px 24px; }
+		.card { background: #111827; border: 1px solid #334155; border-radius: 18px; padding: 32px; box-shadow: 0 24px 70px rgba(0,0,0,.25); }
+		h1 { margin: 0 0 12px; font-size: 34px; }
+		p { color: #cbd5e1; line-height: 1.6; }
+		code, pre { background: #020617; color: #d1fae5; border-radius: 10px; }
+		pre { padding: 16px; overflow-x: auto; }
+		a { color: #93c5fd; }
+		.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 24px; }
+		.item { border: 1px solid #334155; border-radius: 14px; padding: 16px; background: #0b1120; }
+		.badge { display: inline-block; margin-bottom: 18px; padding: 6px 10px; border-radius: 999px; background: #064e3b; color: #a7f3d0; font-size: 13px; }
+	</style>
+</head>
+<body>
+	<main>
+		<section class="card">
+			<span class="badge">Live demo online</span>
+			<h1>WA Attribution Toolkit</h1>
+			<p>Open-source attribution toolkit for WhatsApp-first funnels using UTMs, click IDs, Cloudflare Workers, D1, Shlink and n8n automation.</p>
+			<div class="grid">
+				<div class="item"><strong>Health</strong><br><a href="${baseUrl}/health">/health</a></div>
+				<div class="item"><strong>Track demo</strong><br><a href="${baseUrl}/track?target=https://example.com&utm_source=demo&utm_campaign=homepage">/track</a></div>
+				<div class="item"><strong>GitHub</strong><br><a href="https://github.com/Robim33/wa-attribution-toolkit">Repository</a></div>
+			</div>
+			<h2>Example request</h2>
+			<pre><code>GET ${baseUrl}/track?target=https://example.com&amp;utm_source=demo&amp;utm_campaign=homepage</code></pre>
+			<p>This public demo is intended for fake data only. Do not send real customer data, private webhook URLs or production campaign identifiers.</p>
+		</section>
+	</main>
+</body>
+</html>`);
 }
 
 async function forwardWebhook(env: Env, event: string, payload: Record<string, unknown>) {
@@ -261,6 +314,7 @@ export default {
 		const url = new URL(request.url);
 
 		try {
+			if (url.pathname === "/" && request.method === "GET") return handleHome(request);
 			if (url.pathname === "/health") return json({ ok: true, service: "wa-attribution-toolkit" });
 			if (url.pathname === "/track" && request.method === "GET") return handleTrack(request, env);
 			if (url.pathname === "/leads" && request.method === "POST") return handleLead(request, env);
