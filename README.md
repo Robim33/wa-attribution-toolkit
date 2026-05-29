@@ -4,6 +4,16 @@ Open-source toolkit for tracking WhatsApp leads from paid campaigns, short links
 
 This project gives developers and small teams a self-hosted attribution layer for WhatsApp-first funnels. It captures campaign parameters, creates a durable `click_id`, stores events in Cloudflare D1, redirects users to the destination URL, receives lead events, and forwards structured webhooks to n8n or any compatible automation endpoint.
 
+## Demo
+
+A small public demo is available at:
+
+```text
+https://wa-attribution-toolkit.vanguarda-e-ads.workers.dev
+```
+
+The demo is intended to show the basic click-to-lead attribution flow. Use fake data only.
+
 ## Why this exists
 
 Many businesses run acquisition through WhatsApp, paid media and short links, but attribution is usually fragmented across ad platforms, spreadsheets, CRMs and closed tools. This toolkit provides a small, auditable and self-hosted alternative.
